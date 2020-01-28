@@ -1,0 +1,135 @@
+body {
+  padding: 20px 100px;
+}
+
+h1 > a{
+  color: black;
+} 
+
+.centeredParent{
+  width:100%;
+  position: relative;
+}
+
+.centered {
+  text-align: center;
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  /* bring your own prefixes */
+  transform: translateX(-50%);
+  width: 1000px;
+}
+
+.toast-body {
+  background-color: #555;
+  color: #fff;
+  font-size: 1.25em;
+}
+
+.form-check-input {
+  margin-top: .2rem;
+}
+
+.nav-link{
+  color: #999;
+}
+.nav-link:hover{
+  color: black;
+}
+
+.selected-page {
+  color: #17a2b8;
+}
+
+.selected-page:hover{
+  color: #117a8b;
+}
+
+.navbar .nav-item:not(:last-child) {
+  margin-right: 55px;
+}
+ 
+.dropdown-toggle::after {
+   transition: transform 0.15s linear; 
+}
+ 
+.show.dropdown .dropdown-toggle::after {
+  transform: translateY(3px);
+}
+
+.dropdown-menu{
+  top: 95%;
+}
+
+
+a[target='_blank']::after {
+  padding-left: 5px; 
+  content: '\29C9';
+}
+
+
+
+
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
