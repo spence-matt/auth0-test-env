@@ -45,20 +45,20 @@
     APICLIENTSECRET = '';
     
 	var app = new Vue({
-	el: '#app',
-	data: {
-    domain: DOMAIN,
-    customDomain: CUSTOMDOMAIN,
-		clientId: CLIENT_ID,
-		audience: AUDIENCE,
-		connection: CONNECTION,
-		scope: SCOPE,
-		responseType: RESPONSE_TYPE,
-		prompt: PROMPT,
-		url: URL,
-		apiClientID: APICLIENTID,
-        apiClientSecret: APICLIENTSECRET
-	}
+    el: '#app',
+    data: {
+      domain: DOMAIN,
+      customDomain: CUSTOMDOMAIN,
+      clientId: CLIENT_ID,
+      audience: AUDIENCE,
+      connection: CONNECTION,
+      scope: SCOPE,
+      responseType: RESPONSE_TYPE,
+      prompt: PROMPT,
+      url: URL,
+      apiClientID: APICLIENTID,
+      apiClientSecret: APICLIENTSECRET
+    }
 	})
 
 </script>
