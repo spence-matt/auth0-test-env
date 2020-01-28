@@ -10,7 +10,7 @@ Make sure to fill in all values in `basic.php` and `spa.php`
 php -S localhost:3000
 ```
 
-The app will be served at [http://localhost:3000/](http://localhost:3000/).
+The app will be served at [http://localhost:3000/basic.php](http://localhost:3000/basic.php).
 
 ## Create a free account in Auth0
 
