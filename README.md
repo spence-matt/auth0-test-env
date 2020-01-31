@@ -24,7 +24,7 @@ In your Single Page Application:
 
 `Allowed Callback URLs` should include `http://localhost:3000/spa.php` 
 
-`Allowed Logout URLs` should include `http://localhost:3000/basic.php` 
+`Allowed Logout URLs` should include `http://localhost:3000/spa.php` 
 
 `Allowed Web Origins` should include `http://localhost:3000` 
 
