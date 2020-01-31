@@ -1,6 +1,7 @@
 ## Getting Started
 
 Before starting, make sure you have `php` installed.
+
 Make sure to fill in all values in `basic.php` and `spa.php`
 
 ## Auth0 Dashboard Config Options
