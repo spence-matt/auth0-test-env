@@ -1,5 +1,6 @@
 body {
   padding: 20px 100px;
+  font-family: 'Roboto Mono', monospace;
 }
 
 h1 > a{
@@ -18,7 +19,7 @@ h1 > a{
   bottom: 20px;
   /* bring your own prefixes */
   transform: translateX(-50%);
-  width: 1000px;
+  /* width: 1000px; */
 }
 
 .toast-body {
@@ -132,4 +133,13 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+.tableHeader{
+  color: black;
+}
+
+.toast{
+  z-index: 100000;
+  max-width: 1000px;
 }

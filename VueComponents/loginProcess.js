@@ -39,10 +39,6 @@ function getCookie(cname) {
     return "";
 }
 
-$(document).ready(function(){
-    $('.toast').toast('show');
-});
-
 Vue.component('login-process', {
     props: [
         'normalDomain', 
@@ -60,10 +56,11 @@ Vue.component('login-process', {
     ],
     template: "\
     <div>\
-    <div>Domain: {{domain}} <a target='_blank' :href='websiteLink'>Dashboard</a>&nbsp;&nbsp;&nbsp;<a target='_blank' :href='websiteLink + \"/login_settings\"'>Lock</a></div>\
-    <div>Client ID: {{clientId}} <a target='_blank' :href=\"websiteLink + '/applications/'+ clientId + '/settings' \">App Settings</a></div>\
-    <div>Audience: {{audience}} <a href='#' @click.prevent='editAudience' data-toggle='modal' data-target='#audienceModal'>(Edit)</a></div>\
-    <div>Connection: {{connection}} <a href='#' @click.prevent='editConnection' data-toggle='modal' data-target='#connectionModal'>(Edit)</a></div>\
+    <div><a href='#' @click.prevent='copyToClipboard(\"Domain\", domain)'><strong style='font-size:20px'></strong>Domain:</a> {{domain}} &nbsp;<a target='_blank' :href='websiteLink'>Dashboard</a>&nbsp;&nbsp;&nbsp;<a target='_blank' :href='websiteLink + \"/login_settings\"'>Lock</a>&nbsp;&nbsp;&nbsp;<a target='_blank' :href='inspectorLink'>Inspector</a>&nbsp;&nbsp;&nbsp;<a target='_blank' :href='realtimeExtension'>Realtime Extension</a></div>\
+    <div><a href='#' @click.prevent='copyToClipboard(\"Client ID\", clientId)'><strong style='font-size:20px'></strong>Client ID: </a> {{clientId}}&nbsp;<a target='_blank' :href=\"websiteLink + '/applications/'+ clientId + '/settings' \">App Settings</a></div>\
+    <div> <a href='#' @click.prevent='copyToClipboard(\"Audience\", audience)'><strong style='font-size:20px'></strong> Audience: </a> {{audience}} <a href='#' @click.prevent='editAudience' data-toggle='modal' data-target='#audienceModal'>(Edit)</a></div>\
+    <div>Connection: {{connection}} <a href='#' @click.prevent='editConnection' data-toggle='modal' data-target='#connectionModal'>(Edit)</a><a href='#' v-if='connection' @click.prevent='clearConnection'>(Clear)</a></div>\
+    <div><a target='_blank' :href=\"websiteLink + '/mfa/'\">MFA</a></div>\
     </br>\
     <button type='button' class='btn btn-dark btn-sm' @click.prevent='login'>Login</button>\
     <button v-if='smsLogin' type='button' class='btn btn-dark btn-sm' @click.prevent='loginViaSMS'>Login SMS</button>\
@@ -80,12 +77,12 @@ Vue.component('login-process', {
             {{error}}\
         </div>\
         <div v-else-if='error' class='alert alert-danger' role='alert'>\
-            {{error}}\
+            <pre style='margin-bottom:0px;'>{{error}}</pre>\
         </div>\
         <div v-if='values'>\
             <div class='row'>\
                 <div class='col-lg-6'>\
-                    <a href='#' @click.prevent='copyToClipboard(\"Access Payload Token\", accessTokenPayload)'><strong style='font-size:20px'>Access Token Payload:</strong></a>\
+                    <a href='#' @click.prevent='copyToClipboard(\"Access Token Payload\", accessTokenPayload)'><strong style='font-size:20px'>Access Token Payload:</strong></a>\
                     <br/>\
                     <pre>{{accessTokenPayload}}</pre>\
                 </div>\
@@ -145,7 +142,7 @@ Vue.component('login-process', {
             </div>\
         </div>\
         <div class='modal fade ' id='connectionModal' tabindex='-1' role='dialog' aria-labelledby='connectionModalLabel' aria-hidden='true'>\
-            <div class='modal-dialog modal-lg' role='document'>\
+            <div class='modal-dialog modal-xl' role='document'>\
                 <div class='modal-content'>\
                     <div class='modal-header'>\
                         <h5 class='modal-title' id='connectionModalLabel'>Connection</h5>\
@@ -159,8 +156,10 @@ Vue.component('login-process', {
                                 <tr>\
                                     <th scope='col'></th>\
                                     <th scope='col'>Connection</th>\
+                                    <th scope='col'>Id</th>\
                                     <th scope='col'>Strategy</th>\
                                     <th scope='col'>Enabled</th>\
+                                    <th scope='col' @click='canDeleteConnections = !canDeleteConnections'>Delete</th>\
                                 </tr>\
                             </thead>\
                             <tbody>\
@@ -179,13 +178,17 @@ Vue.component('login-process', {
                                             <input class='form-check-input' type='radio' name='exampleRadios' v-bind:value='option' :id='option' v-model='tempConnection' :value='option.name' >\
                                         </div>\
                                     </td>\
-                                    <td>{{option.name}}</td>\
+                                    <td><a href='#' @click.prevent='copyToClipboard(\"Connection Name\", option.name)'>{{option.name}}</a> <a v-if='option.url' target='_blank' :href='option.url'></a></td>\
+                                    <td> <a href='#' @click.prevent='copyToClipboard(\"Connection Id\", option.id)'>{{option.id}}</a></td>\
                                     <td>{{option.strategy}}</td>\
                                     <td>\
                                         <label class='switch' >\
                                             <input type='checkbox' v-on:click='toggleConnectionEnabled(option)' v-model='option.enabled'>\
                                             <span class='slider'></span>\
                                         </label>\
+                                    </td>\
+                                    <td>\
+                                        <button v-if='canDeleteConnections' style='width:80px; margin-bottom:5px;' type='button' class='btn btn-danger btn-sm' @click='deleteConnection(option)'>Delete</button>\
                                     </td>\
                                 </tr>\
                             </tbody>\
@@ -210,6 +213,8 @@ Vue.component('login-process', {
     data: function(){
         return{
             websiteLink: '',
+            inspectorLink: '',
+            realtimeExtension: '',
             domain: '',
             audience: '', 
             tempAudience: '',
@@ -217,6 +222,7 @@ Vue.component('login-process', {
             connection: '',
             tempConnection: '',
             connectionList: [],
+            canDeleteConnections: false,
             apiToken: '',
             accessToken: '', 
             accessTokenPayload: '', 
@@ -234,7 +240,10 @@ Vue.component('login-process', {
               prompt: this.prompt,
               scope: this.scope,
               connection: this.connection,
+            //   redirectUri: 'http://localhost:3000/basic.php',
               audience: this.audience,
+              responseType:RESPONSE_TYPE,
+            //   screen_hint:'signup'
             })
         },
         silentLogin () {
@@ -253,7 +262,7 @@ Vue.component('login-process', {
         },
         loginPasswordless (){
             var options = {
-                passwordlessMethod: 'link'
+                passwordlessMethod: 'code'
               };
             var lockPasswordless = new Auth0LockPasswordless(this.clientId, this.domain, options);
             lockPasswordless.show({
@@ -268,7 +277,7 @@ Vue.component('login-process', {
         },
         logoutFederated(){
             auth0.logout({
-              federated: true,
+              federated: "true",
               returnTo: URL,
               clientID: CLIENT_ID
             })
@@ -277,12 +286,13 @@ Vue.component('login-process', {
             this.values = true;
             this.accessToken = data.accessToken;
             this.childToParent();
-            if (data.accessToken.startsWith('eyJ')) {
+            if (data.accessToken && data.accessToken.startsWith('eyJ')) {
                 var atp = JSON.parse(atob(data.accessToken.split('.')[1]))
                 this.accessTokenPayload = JSON.stringify(atp, 0, 4);
             }
             this.idToken = data.idToken;
             this.idTokenPayload = JSON.stringify(data.idTokenPayload, 0, 4);
+
             this.error = '';
         },
         setUserInfo (data) {
@@ -292,6 +302,7 @@ Vue.component('login-process', {
             var setValues = this.setValues;
             var setUserInfo = this.setUserInfo;
             var silentLogin = this.silentLogin;
+            var setError = this.setError;
             auth0.parseHash(function(err, data) {
                 if (data) {
                     setValues(data);
@@ -302,9 +313,13 @@ Vue.component('login-process', {
                     if (err === null){
                         silentLogin();
                     } 
-                    // console.log(err);
+                    console.log(err);
+                    setError(err);
                 }
             })
+        },
+        setError(err){
+            this.error = err;
         },
         copyToClipboard(copyText, val){
             var $temp = $("<input>");
@@ -312,6 +327,9 @@ Vue.component('login-process', {
             $temp.val(val).select();
             document.execCommand("copy");
             $temp.remove();
+            this.showToast(copyText);
+        },
+        showToast(copyText){
             this.copyText = copyText + ' Copied to Clipboard';
             $('.toast').toast('show');
         },
@@ -325,7 +343,7 @@ Vue.component('login-process', {
                 "headers": {
                   "content-type": "application/json"
                 },
-                "data": "{\"client_id\":\"" + this.apiClientId + "\",\"client_secret\":\"" + this.apiClientSecret + "\",\"audience\":\"https://" + this.normalDomain + "/api/v2/\",\"grant_type\":\"client_credentials\"}"
+                "data": "{\"scope\":\"read:client_grants\", \"client_id\":\"" + this.apiClientId + "\",\"client_secret\":\"" + this.apiClientSecret + "\",\"audience\":\"https://" + this.normalDomain + "/api/v2/\",\"grant_type\":\"client_credentials\"}"
               }
               
               $.ajax(settings).done(function (response) {
@@ -365,6 +383,8 @@ Vue.component('login-process', {
             this.audience = val;
         },
         editConnection (){
+            this.canDeleteConnections = false;
+
             var setConnectionList = this.setConnectionList;
             var settings = {
                 "async": true,
@@ -381,14 +401,40 @@ Vue.component('login-process', {
                 setConnectionList(response);
               });
         },
+        getConnectionURL (connection){
+            switch(connection.strategy){
+                case("oidc"):
+                case("waad"):
+                case("ad"):
+                case("samlp"):
+                    return this.websiteLink + "/connections/enterprise/" + connection.strategy + "/" + connection.id  + "/settings";
+                case("auth0"):
+                    return this.websiteLink + "/connections/database/" + connection.id  + "/settings";
+                case("apple"):
+                case("linkedin"):
+                case("facebook"):
+                case("soundcloud"):
+                case("twitter"):
+                case("windowslive"):
+                case("yahoo"):
+                case("google-oauth2"):
+                    return this.websiteLink + "/connections/social/" + connection.id  + "/settings";
+                case("email"):
+                case("sms"):
+                    return this.websiteLink + "/connections/passwordless";
+
+            }
+        },
         setConnectionList (val){
             var conList = [];
+            var getConnectionURL = this.getConnectionURL;
             val.forEach(element => {
                 var enabled = false;
                 if (element.enabled_clients.includes(this.clientId)){
                     enabled = true;
                 }
                 element.enabled = enabled;
+                element.url = getConnectionURL(element);
                 conList.push(element);
             });
             this.connectionList = conList;
@@ -396,6 +442,30 @@ Vue.component('login-process', {
         saveConnection (val){
             document.cookie = this.clientId +"_Connection=" + val;
             this.connection = val;
+            
+        },
+        clearConnection (){
+            document.cookie = this.clientId +"_Connection=" ;
+            this.connection = "";
+            this.tempConnection = "";
+        },
+        deleteConnection (val){ 
+            var settings = {
+                "async": true,
+                "crossDomain": true,
+                "url": "https://" + this.domain + "/api/v2/connections/" + val.id,
+                "method": "DELETE",
+                "headers": {
+                    "authorization": "Bearer " + this.apiToken,
+                    "content-type": "application/json"
+                }
+              }
+              
+              $.ajax(settings).done(function (response) {
+                console.log(response);
+              });
+
+
         },
         toggleConnectionEnabled(val){
             var enabledClients = val.enabled_clients;
@@ -439,6 +509,8 @@ Vue.component('login-process', {
         getWebsiteLink (){
             var domainSplit = this.normalDomain.split(".");
             this.websiteLink = "https://manage.auth0.com/dashboard/" + domainSplit[1] + "/" + domainSplit[0];
+            this.inspectorLink = "https://support.it.auth0.com/inspector/" + domainSplit[0]+ "@" + domainSplit[1] + "/settings?preselect=true";
+            this.realtimeExtension = "https://" + domainSplit[0] + ".au8.webtask.io/a9446dcf57413cd0ec81c8a5456518f9";
         }
     },
     created(){
@@ -447,24 +519,33 @@ Vue.component('login-process', {
         var audienceCookie = getCookie(this.clientId + "_Audience");
         if (audienceCookie){
             this.audience = audienceCookie;
+            this.tempAudience = audienceCookie;
         } else {
             this.audience = this.promptAudience;
+            this.tempAudience = this.promptAudience;
         }
         var connectionCookie = getCookie(this.clientId + "_Connection");
         if (connectionCookie){
             this.connection = connectionCookie;
+            this.tempConnection = connectionCookie;
         } else {
             this.connection = this.promptConnection;
+            this.tempConnection = this.promptConnection;
         }
+
+        var showToast = this.showToast;
+        bus.$on('show-toast', function(text) {
+            showToast(text);
+         })
     },
     mounted(){
         this.getAPIToken();
         this.writeInfo();
 
-        if (getParameterByName('error_description'))
-        {
-            this.error = getParameterByName('error_description')
-        } 
+        // if (getParameterByName('error_description'))
+        // {
+        //     this.error = getParameterByName('error_description')
+        // } 
     }
 })
 

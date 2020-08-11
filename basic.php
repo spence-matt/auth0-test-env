@@ -5,6 +5,7 @@
   <div id="app">
     <?php include("php/additionalOptions.php") ?>
     </br>
+    
     <login-process 
       v-on:set-info-child-to-parent="setInfoFromChild($event)"
       :normal-domain="domain" 
@@ -20,29 +21,35 @@
     </login-process>
   </div>
   <div id="logs"></div>
-
   <?php include("php/scripts.php") ?>
 
-<script>
-    //Values for a Regular Web App
-    DOMAIN = '';
-    CLIENT_ID = '';
-    
-    AUDIENCE = '';
-    CONNECTION = '';
-    SCOPE = 'openid profile email';
-    RESPONSE_TYPE = 'token id_token';
-    
-    PROMPT = '';
-    
-    //These values are from the API Explorer Application 
-    APICLIENTID = '';
-    APICLIENTSECRET = '';
-    
+  <script>
+      
+
+
+      DOMAIN = '';
+      CLIENT_ID = '';
+      
+      AUDIENCE = '';
+      CONNECTION = '';
+      SCOPE = 'openid profile email read:invoice';
+      RESPONSE_TYPE = 'token id_token';
+      
+      PROMPT = '';
+      
+      APICLIENTID = '';
+      APICLIENTSECRET = '';
+
+      
+
+
   </script>
   <script src="/js/vueComp.js"></script>
 
 </body>
 </html>
+
+
+
 
 

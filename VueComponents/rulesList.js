@@ -1,4 +1,15 @@
-
+$(function() {
+    $('#textarea').on('keydown', function(e) {
+      if (e.keyCode == 9 || e.which == 9) {
+        e.preventDefault();
+        var s = this.selectionStart;
+        $(this).val(function(i, v) {
+          return v.substring(0, s) + "\t" + v.substring(this.selectionEnd)
+        });
+        this.selectionEnd = s + 1;
+      }
+    });
+  });
 Vue.component('rules', {
     props: [
         'accessToken',
@@ -13,7 +24,7 @@ Vue.component('rules', {
             <div class='modal-dialog modal-xl' role='document'>\
                 <div class='modal-content'>\
                     <div class='modal-header'>\
-                        <h5 class='modal-title' id='rulesModalLabel'>Rules List</h5>\
+                        <h5 class='modal-title' id='rulesModalLabel'>Rules List <a target='_blank' :href='websiteLink'></a></h5>\
                         <button type='button' class='close' data-dismiss='modal' aria-label='Close'>\
                         <span aria-hidden='true'>&times;</span>\
                         </button>\
@@ -26,6 +37,7 @@ Vue.component('rules', {
                                     <th scope='col'>Rule</th>\
                                     <th scope='col'>Script</th>\
                                     <th scope='col'>Order</th>\
+                                    <th scope='col'></th>\
                                 </tr>\
                             </thead>\
                             <tbody>\
@@ -39,9 +51,18 @@ Vue.component('rules', {
                                         <span class='slider'></span>\
                                     </label>\
                                 </td>\
-                                <td>{{option.name}}</td>\
-                                <td><code style='white-space: pre-wrap;' v-bind:style='{ color: option.enabled ? \"\" : \"black\"}'>{{option.script}}</code></td>\
+                                <td>{{option.name}} <a target='_blank' :href='websiteLink + \"/\" +  option.id'></a></td>\
+                                <td >\
+                                    <code v-if='!option.editing' style='white-space: pre-wrap;' v-bind:style='{ color: option.enabled ? \"\" : \"black\"}'>{{option.script}}</code>\
+                                    <textarea :id='option.id' v-else style='width: 100%;' oninput='this.style.height = \"\";this.style.height = this.scrollHeight + \"px\"'  v-model='option.script' ></textarea>\
+                                </td>\
                                 <td>{{option.order}}</td>\
+                                <td >\
+                                    <button v-if='!option.editing' style='width:80px' type='button' class='btn btn-info btn-sm' @click='setEditRule(option)'>Edit</button>\
+                                    <button v-if='option.editing' style='width:80px; margin-bottom:5px;' type='button' class='btn btn-success btn-sm' @click='saveRule(option)'>Save</button>\
+                                    </br v-if='option.editing'>\
+                                    <button v-if='option.editing' style='width:80px' type='button' class='btn btn-danger btn-sm' @click='option.script = option.previous; option.editing = false'>Cancel</button>\
+                                </td>\
                             </tr>\
                             </tbody>\
                         </table>\
@@ -63,14 +84,9 @@ Vue.component('rules', {
         }
     },
     methods: {
-        copyToClipboard(copyText, text){
-            var $temp = $("<input>");
-            $("body").append($temp);
-            $temp.val(text).select();
-            document.execCommand("copy");
-            $temp.remove();
-            this.copyText = copyText + ' Copied to Clipboard';
-            $('.toast').toast('show');
+        getDomainLink(){
+            var domainSplit = this.domain.split(".");
+            this.websiteLink = "https://manage.auth0.com/dashboard/" + domainSplit[1] + "/" + domainSplit[0] + "/rules";
         },
         getRuleList(){
             var setRulesList = this.setRulesList;
@@ -87,14 +103,13 @@ Vue.component('rules', {
             }
               
             $.ajax(settings).done(function (response) {
-                // console.log(response);
                 setRulesList(response);
             });
         },
         setRulesList(val){
             var rules = [];
             val.forEach(element => {
-                var rule = { "id": element.id,  "name": element.name, "script": element.script, "enabled": element.enabled, "order": element.order};
+                var rule = { "id": element.id,  "name": element.name, "script": element.script, "enabled": element.enabled, "order": element.order, "editing": false};
                 rules.push(rule)
             });
             rules.sort(compareValues('order', 'asc'));
@@ -103,7 +118,6 @@ Vue.component('rules', {
             this.loading = false;
         },
         toggleRuleEnabled(rule) {
-            // console.log(rule);
             var settings = {
                 "async": true,
                 "crossDomain": true,
@@ -118,11 +132,39 @@ Vue.component('rules', {
             }
               
             $.ajax(settings).done(function (response) {
-                // console.log(response);
+                console.log(response);
             });
         },
         setApiVal (val){
             this.apiToken = val;
+        },
+        setEditRule(rule){
+            rule.editing = true;
+            setTimeout(function(){             
+                var textarea = document.getElementById(rule.id);
+                textarea.style.height =  textarea.scrollHeight + "px";
+            }, 10);
+
+            rule.previous = rule.script.toString();
+        },
+        saveRule (rule){
+            var settings = {
+                "async": true,
+                "crossDomain": true,
+                "url": "https://" + this.domain + "/api/v2/rules/" + rule.id,
+                "method": "PATCH",
+                "headers": {
+                    "authorization": "Bearer " + this.apiToken,
+                    "content-type": "application/json"
+                },
+                "data": "{\"script\":" + JSON.stringify(rule.script) + "}"
+
+            }
+              
+            $.ajax(settings).done(function (response) {
+                console.log(response);
+                rule.editing = false;
+            });
         }
     },
     created(){
@@ -130,6 +172,7 @@ Vue.component('rules', {
         bus.$on('set-api-token', function(info) {
             setApiVal(info);
          })
+         this.getDomainLink();
     },
     mounted(){
       

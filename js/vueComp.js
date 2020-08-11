@@ -27,7 +27,6 @@
       methods: {
         setInfoFromChild (val){
           this.apiToken = val.apiToken;
-          // console.log(val);
         }
       }
     })
