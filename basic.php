@@ -13,7 +13,6 @@
       :scope="scope"
       :prompt-connection="connection" 
       :prompt-audience="audience" 
-      :sms-login="false"
       :prompt='prompt'
       :api-client-id='apiClientID'
       :api-client-secret='apiClientSecret'>
