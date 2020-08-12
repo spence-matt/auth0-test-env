@@ -16,36 +16,29 @@
       :sms-login="false"
       :prompt='prompt'
       :api-client-id='apiClientID'
-      :passwordless-login='false'
       :api-client-secret='apiClientSecret'>
     </login-process>
   </div>
   <div id="logs"></div>
   <?php include("php/scripts.php") ?>
-
   <script>
+    //Values for a Regular Web App
+    DOMAIN = '';
+    CLIENT_ID = '';
       
-
-
-      DOMAIN = '';
-      CLIENT_ID = '';
+    AUDIENCE = '';
+    CONNECTION = '';
+    SCOPE = 'openid profile email';
+    RESPONSE_TYPE = 'token id_token';
       
-      AUDIENCE = '';
-      CONNECTION = '';
-      SCOPE = 'openid profile email read:invoice';
-      RESPONSE_TYPE = 'token id_token';
+    PROMPT = '';
       
-      PROMPT = '';
-      
-      APICLIENTID = '';
-      APICLIENTSECRET = '';
-
-      
-
+    //These values are from the API Explorer Application 
+    APICLIENTID = '';
+    APICLIENTSECRET = '';
 
   </script>
   <script src="/js/vueComp.js"></script>
-
 </body>
 </html>
 

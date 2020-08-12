@@ -47,12 +47,9 @@ Vue.component('login-process', {
         'promptAudience', 
         'scope', 
         'promptConnection', 
-        'smsLogin',
-        'passwordlessLogin',
         'prompt',
         'apiClientSecret',
-        'apiClientId',
-        'passwordless'
+        'apiClientId'
     ],
     template: "\
     <div>\
@@ -63,8 +60,6 @@ Vue.component('login-process', {
     <div><a target='_blank' :href=\"websiteLink + '/mfa/'\">MFA</a></div>\
     </br>\
     <button type='button' class='btn btn-dark btn-sm' @click.prevent='login'>Login</button>\
-    <button v-if='smsLogin' type='button' class='btn btn-dark btn-sm' @click.prevent='loginViaSMS'>Login SMS</button>\
-    <button v-if='passwordlessLogin' type='button' class='btn btn-dark btn-sm' @click.prevent='loginPasswordless'>Login Passwordless</button>\
     <button type='button' class='btn btn-dark btn-sm' @click.prevent='silentLogin'>Silent Login</button>\
     <button type='button' class='btn btn-dark btn-sm' @click.prevent='logout'>Logout</button>\
     <button type='button' class='btn btn-dark btn-sm' @click.prevent='logoutFederated'>Logout Federated</button>\
@@ -253,21 +248,6 @@ Vue.component('login-process', {
               connection: this.connection,
               audience: this.audience,
             })
-        },
-        loginViaSMS (){
-            var lockPasswordless = new Auth0LockPasswordless(this.clientId, this.domain);
-            lockPasswordless.show({
-                allowedConnections: ['sms']
-            });
-        },
-        loginPasswordless (){
-            var options = {
-                passwordlessMethod: 'code'
-              };
-            var lockPasswordless = new Auth0LockPasswordless(this.clientId, this.domain, options);
-            lockPasswordless.show({
-                // passwordlessMethod: 'link'
-            });
         },
         logout () {
             auth0.logout({

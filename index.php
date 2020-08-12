@@ -11,12 +11,14 @@
   <a href="https://auth0team.atlassian.net/wiki/spaces/DS/overview?homepageId=5964740">DSE Confluence Page</a><br/>
   <a href="https://github.com/auth0/">Auth0 GitHub</a><br/>
   <a href="https://auth0team.atlassian.net/jira/servicedesk/projects/ESD/issues/?filter=allissues">Confluence - Search ESD</a><br/>
-  <a href="https://docs.google.com/spreadsheets/d/1_6bSut91nCT4XycpLNrsx5gZQMdXowTmtISwiDx5HdM/edit?usp=sharing">Team Domain Mapping</a><br/>
+  <a href="https://docs.google.com/spreadsheets/d/1Ftg_I3QA1AStArObNfavLRVPej7606nyj94RWvsDPqI/edit?usp=sharing">Team Domain Mapping</a><br/>
+  <a href="https://auth0team.atlassian.net/servicedesk/customer/portals">Auth0 Help Centre</a>
   <a href="https://github.com/auth0/auth0-cse/tree/master/customers/">PSaaS Customer List</a><br/>
   <a href="https://app.prodpad.com/feedback/?view=backlog">ProdPad</a><br/>
-  <a href="https://docs.google.com/document/d/1NvD4cay8dIYWdQVpJ84xBoalYv8YVRXqJQwSf11MYPM/edit">Soft Skills Quick Reference</a>
+  <a href="https://docs.google.com/document/d/1NvD4cay8dIYWdQVpJ84xBoalYv8YVRXqJQwSf11MYPM/edit">Soft Skills Quick Reference</a><br/>
   <br/>
   <h4>Other Websites</h4>
+  <a href="https://samltool-io.vercel.app/">New SAML tool</a><br/>
   <a href="https://toolbox.googleapps.com/apps/har_analyzer/">HAR Analyser</a><br/>
   <a href="https://www.timeanddate.com/worldclock/meeting.html">Timezone Planner</a><br/>
 </body>
