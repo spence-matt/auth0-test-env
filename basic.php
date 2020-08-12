@@ -37,7 +37,6 @@
     APICLIENTID = '';
     APICLIENTSECRET = '';
 
-
   </script>
   <script src="/js/vueComp.js"></script>
 </body>
